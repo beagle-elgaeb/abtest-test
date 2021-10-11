@@ -1,6 +1,8 @@
 import styled from "styled-components/macro";
 import "./App.css";
 
+import plus from "./images/icon-plus.svg";
+
 function App() {
   return (
     <div className="App">
@@ -22,8 +24,14 @@ function App() {
               <Input type="date" />
               <Input type="date" />
             </Fieldset>
-            <AddButton>Add one more</AddButton>
+            <AddButton>
+              <Plus src={plus} />
+              Add one more
+            </AddButton>
+            <div>
+            <SubmitButton>Save</SubmitButton>
             <SubmitButton>Create</SubmitButton>
+            </div>
           </Form>
         </Calculator>
       </Main>
@@ -157,7 +165,8 @@ const Input = styled.input`
 `;
 
 const AddButton = styled.button`
-  display: block;
+  display: flex;
+  align-items: center;
   background: transparent;
   border: none;
   outline: none;
@@ -166,6 +175,12 @@ const AddButton = styled.button`
   font-weight: 400;
   color: #5d6e97;
   margin: 32px 0 0 0;
+`;
+
+const Plus = styled.img`
+  width: 16px;
+  height: 16px;
+  margin: 0 10px 0 0;
 `;
 
 const SubmitButton = styled.button`

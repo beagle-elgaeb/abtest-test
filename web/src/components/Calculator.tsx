@@ -13,6 +13,8 @@ function Calculator() {
     },
   ]);
 
+  const [rollingRetention, setRollingRetention] = useState<number>();
+
   useEffect(() => {
     async function loadUsers() {
       const users = await api.getUsers();
@@ -61,6 +63,30 @@ function Calculator() {
     setUsers(promisedUsers);
   }
 
+  function calculateRollingRetention() {
+    const msInDay = 86400000;
+
+    const returningUsers = users.filter((user) => {
+      const reg = new Date(user.dateRegistration);
+      const lastAct = new Date(user.dateLastActivity);
+
+      const period = (lastAct.getTime() - reg.getTime()) / msInDay;
+
+      return period >= 7;
+    });
+
+    const registeredUsers = users.filter((user) => {
+      const reg = new Date(user.dateRegistration);
+      const now = new Date();
+
+      const period = (now.getTime() - reg.getTime()) / msInDay;
+
+      return period >= 7;
+    });
+
+    setRollingRetention((returningUsers.length * 100) / registeredUsers.length);
+  }
+
   return (
     <CalculatorContainer>
       <Title>Calculator</Title>
@@ -94,11 +120,19 @@ function Calculator() {
           <Plus src={plus} />
           Add one more
         </AddButton>
+        <Metric>
+          <MetricTitle>
+            Rolling Retention 7 day: {rollingRetention}%
+          </MetricTitle>
+          <Histogram></Histogram>
+        </Metric>
         <Buttons>
           <Button type="button" onClick={saveUsers}>
             Save
           </Button>
-          <Button>Create</Button>
+          <Button type="button" onClick={calculateRollingRetention}>
+            Create
+          </Button>
         </Buttons>
       </Form>
     </CalculatorContainer>
@@ -137,7 +171,7 @@ const Fieldset = styled.fieldset`
   margin: 45px 0 0 0;
 `;
 
-const Subtitle = styled.h3`
+const Subtitle = styled.h4`
   font-size: 14px;
   line-height: 16px;
   font-weight: 400;
@@ -192,10 +226,28 @@ const Plus = styled.img`
   margin: 0 10px 0 0;
 `;
 
+const Metric = styled.div``;
+
+const MetricTitle = styled.h3`
+  font-size: 17px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #3c5aa8;
+  text-transform: uppercase;
+  text-align: left;
+  opacity: 0.6;
+  margin: 40px 0 15px 0;
+`;
+
+const Histogram = styled.div`
+  height: 400px;
+  border: 1px solid red;
+`;
+
 const Buttons = styled.div`
   display: flex;
   justify-content: center;
-  margin: 142px 0 19px 0;
+  margin: 50px 0 19px 0;
 `;
 
 // todo: можно сделать неактивными, если ничего не изменено

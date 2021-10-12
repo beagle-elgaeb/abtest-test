@@ -21,7 +21,7 @@ client.connect();
 
 app.get("/users", async (req, res) => {
   try {
-    const users = await client.query("SELECT * FROM users");
+    const users = await client.query("SELECT * FROM users ORDER BY id");
 
     const newFormatUsers = users.rows.map((user) => ({
       id: user.id,
@@ -32,6 +32,50 @@ app.get("/users", async (req, res) => {
     res.send(newFormatUsers);
   } catch (err) {
     res.status(500).send({ message: "Сервер не может обработать запрос" });
+  }
+});
+
+app.post("/users", async (req, res) => {
+  try {
+    const users = await client.query(
+      `INSERT INTO users(date_registration, date_last_activity) VALUES('${req.body.dateRegistration}', '${req.body.dateLastActivity}') RETURNING id, date_registration, date_last_activity `
+    );
+
+    const user = users.rows[0];
+
+    const newFormatUser = {
+      id: user.id,
+      dateRegistration: user.date_registration,
+      dateLastActivity: user.date_last_activity,
+    };
+
+    res.send(newFormatUser);
+  } catch (err) {
+    res.status(500).send({
+      message: `Сервер не может обработать запрос. Статус ошибки: ${err.message}`,
+    });
+  }
+});
+
+app.patch("/users", async (req, res) => {
+  try {
+    const users = await client.query(
+      `UPDATE users SET date_registration='${req.body.dateRegistration}',date_last_activity='${req.body.dateLastActivity}' WHERE id=${req.body.id} RETURNING id, date_registration, date_last_activity`
+    );
+
+    const user = users.rows[0];
+
+    const newFormatUser = {
+      id: user.id,
+      dateRegistration: user.date_registration,
+      dateLastActivity: user.date_last_activity,
+    };
+
+    res.send(newFormatUser);
+  } catch (err) {
+    res.status(500).send({
+      message: `Сервер не может обработать запрос. Статус ошибки: ${err.message}`,
+    });
   }
 });
 

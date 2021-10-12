@@ -1,18 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-
-import * as api from "../utils/Api";
-
 import plus from "../images/icon-plus.svg";
+import * as api from "../utils/Api";
+import { UserData } from "../utils/types";
 
 function Calculator() {
-  type StateType = {
-    id: undefined | number;
-    dateRegistration: string;
-    dateLastActivity: string;
-  }[];
-
-  const [users, setUsers] = useState<StateType>([
+  const [users, setUsers] = useState<UserData[]>([
     {
       id: undefined,
       dateRegistration: "",
@@ -54,6 +47,20 @@ function Calculator() {
     ]);
   }
 
+  async function saveUsers() {
+    const promisedData = users.map(async (user) => {
+      if (!user.id) {
+        return api.createUser(user);
+      }
+
+      return api.updateUser(user);
+    });
+
+    const promisedUsers = await Promise.all(promisedData);
+
+    setUsers(promisedUsers);
+  }
+
   return (
     <CalculatorContainer>
       <Title>Calculator</Title>
@@ -62,6 +69,7 @@ function Calculator() {
           <Subtitle>User ID</Subtitle>
           <Subtitle>Date Registration</Subtitle>
           <Subtitle>Date Last Activity</Subtitle>
+          {/* todo: можно добавить кнопки удаления строки справа от строки */}
           {users.map((user, i) => (
             <Fragment key={i}>
               <Input type="number" value={user.id ?? ""} readOnly />
@@ -87,7 +95,9 @@ function Calculator() {
           Add one more
         </AddButton>
         <Buttons>
-          <Button>Save</Button>
+          <Button type="button" onClick={saveUsers}>
+            Save
+          </Button>
           <Button>Create</Button>
         </Buttons>
       </Form>
@@ -188,13 +198,14 @@ const Buttons = styled.div`
   margin: 142px 0 19px 0;
 `;
 
+// todo: можно сделать неактивными, если ничего не изменено
+// todo: улучшить UX: добавить многоточие в момент отправки запроса
 const Button = styled.button`
   max-width: 189px;
   width: 45%;
   height: 38px;
   display: block;
   background: #4a9dff;
-  opacity: 0.27;
   border: none;
   border-radius: 10px;
   outline: none;

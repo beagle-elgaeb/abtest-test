@@ -38,7 +38,8 @@ app.get("/users", async (req, res) => {
 app.post("/users", async (req, res) => {
   try {
     const users = await client.query(
-      `INSERT INTO users(date_registration, date_last_activity) VALUES('${req.body.dateRegistration}', '${req.body.dateLastActivity}') RETURNING id, date_registration, date_last_activity `
+      "INSERT INTO users(date_registration, date_last_activity) VALUES($1, $2) RETURNING id, date_registration, date_last_activity",
+      [req.body.dateRegistration, req.body.dateLastActivity]
     );
 
     const user = users.rows[0];
@@ -60,7 +61,8 @@ app.post("/users", async (req, res) => {
 app.patch("/users", async (req, res) => {
   try {
     const users = await client.query(
-      `UPDATE users SET date_registration='${req.body.dateRegistration}',date_last_activity='${req.body.dateLastActivity}' WHERE id=${req.body.id} RETURNING id, date_registration, date_last_activity`
+      "UPDATE users SET date_registration=$1,date_last_activity=$2 WHERE id=$3 RETURNING id, date_registration, date_last_activity",
+      [req.body.dateRegistration, req.body.dateLastActivity, req.body.id]
     );
 
     const user = users.rows[0];

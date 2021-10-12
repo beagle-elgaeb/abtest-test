@@ -3,6 +3,7 @@ import styled from "styled-components/macro";
 import plus from "../images/icon-plus.svg";
 import * as api from "../utils/Api";
 import { UserData } from "../utils/types";
+import { Metric } from "./Metric";
 
 function Calculator() {
   const [users, setUsers] = useState<UserData[]>([
@@ -14,6 +15,7 @@ function Calculator() {
   ]);
 
   const [rollingRetention, setRollingRetention] = useState<number>();
+  const [groupedTimeIntervals, setGroupedTimeIntervals] = useState<number[]>();
 
   useEffect(() => {
     async function loadUsers() {
@@ -84,7 +86,52 @@ function Calculator() {
       return period >= 7;
     });
 
-    setRollingRetention((returningUsers.length * 100) / registeredUsers.length);
+    setRollingRetention(
+      Math.round((returningUsers.length * 100) / registeredUsers.length)
+    );
+
+    const timeIntervals = users.map((user) => {
+      const reg = new Date(user.dateRegistration);
+      const lastAct = new Date(user.dateLastActivity);
+
+      const period = (lastAct.getTime() - reg.getTime()) / msInDay;
+
+      return period;
+    });
+
+    let oneDay = 0;
+    let oneWeek = 0;
+    let twoWeek = 0;
+    let threeWeek = 0;
+    let fourWeek = 0;
+    let fourWeekAndMore = 0;
+
+    console.log(timeIntervals);
+
+    timeIntervals.forEach((interval) => {
+      if (interval === 0) {
+        oneDay++;
+      } else if (interval < 7) {
+        oneWeek++;
+      } else if (interval < 14) {
+        twoWeek++;
+      } else if (interval < 21) {
+        threeWeek++;
+      } else if (interval < 28) {
+        fourWeek++;
+      } else {
+        fourWeekAndMore++;
+      }
+    });
+
+    setGroupedTimeIntervals([
+      oneDay,
+      oneWeek,
+      twoWeek,
+      threeWeek,
+      fourWeek,
+      fourWeekAndMore,
+    ]);
   }
 
   return (
@@ -120,18 +167,16 @@ function Calculator() {
           <Plus src={plus} />
           Add one more
         </AddButton>
-        <Metric>
-          <MetricTitle>
-            Rolling Retention 7 day: {rollingRetention}%
-          </MetricTitle>
-          <Histogram></Histogram>
-        </Metric>
+        <Metric
+          rollingRetention={rollingRetention}
+          groupedTimeIntervals={groupedTimeIntervals}
+        />
         <Buttons>
           <Button type="button" onClick={saveUsers}>
             Save
           </Button>
           <Button type="button" onClick={calculateRollingRetention}>
-            Create
+            Calculate
           </Button>
         </Buttons>
       </Form>
@@ -224,24 +269,6 @@ const Plus = styled.img`
   width: 16px;
   height: 16px;
   margin: 0 10px 0 0;
-`;
-
-const Metric = styled.div``;
-
-const MetricTitle = styled.h3`
-  font-size: 17px;
-  line-height: 20px;
-  font-weight: 400;
-  color: #3c5aa8;
-  text-transform: uppercase;
-  text-align: left;
-  opacity: 0.6;
-  margin: 40px 0 15px 0;
-`;
-
-const Histogram = styled.div`
-  height: 400px;
-  border: 1px solid red;
 `;
 
 const Buttons = styled.div`

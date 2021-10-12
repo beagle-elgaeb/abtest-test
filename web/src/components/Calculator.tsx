@@ -53,6 +53,11 @@ function Calculator() {
 
   async function saveUsers() {
     const promisedData = users.map(async (user) => {
+      // todo: незаполненные строки можно, например, пометить красным
+      if (!user.dateRegistration || !user.dateLastActivity) {
+        return user;
+      }
+
       if (!user.id) {
         return api.createUser(user);
       }
@@ -90,14 +95,18 @@ function Calculator() {
       Math.round((returningUsers.length * 100) / registeredUsers.length)
     );
 
-    const timeIntervals = users.map((user) => {
-      const reg = new Date(user.dateRegistration);
-      const lastAct = new Date(user.dateLastActivity);
+    const timeIntervals = users
+      .filter((user) => {
+        return !!user.dateRegistration && !!user.dateLastActivity;
+      })
+      .map((user) => {
+        const reg = new Date(user.dateRegistration);
+        const lastAct = new Date(user.dateLastActivity);
 
-      const period = (lastAct.getTime() - reg.getTime()) / msInDay;
+        const period = (lastAct.getTime() - reg.getTime()) / msInDay;
 
-      return period;
-    });
+        return period;
+      });
 
     let oneDay = 0;
     let oneWeek = 0;

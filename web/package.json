@@ -1,4 +1,5 @@
 {
+  "homepage": "https://beagle-elgaeb.github.io/",
   "name": "abtest-test",
   "version": "0.1.0",
   "private": true,
@@ -23,7 +24,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "cross-env PUBLIC_URL=/abtest-test yarn build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +47,8 @@
     ]
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
+    "gh-pages": "^3.2.3",
     "prettier": "^2.4.1",
     "typescript": "^4.4.3"
   }

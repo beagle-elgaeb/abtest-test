@@ -1,5 +1,7 @@
 # Тестовое задание от AB test real
 
+[Ссылка на GH Pages](https://beagle-elgaeb.github.io/abtest-test/ "Этот проект на GH Pages")
+
 <p>
   <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript"><img src="readme/icon-js.svg" alt="JS"></a>
   <img src="readme/icon-whitespace-5px.svg"/>

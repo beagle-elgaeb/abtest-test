@@ -51,7 +51,6 @@ function Calculator() {
 
   async function saveUsers() {
     const promisedData = users.map(async (user) => {
-      // todo: незаполненные строки можно, например, пометить красным
       if (!user.dateRegistration || !user.dateLastActivity) {
         return user;
       }
@@ -137,9 +136,11 @@ function Calculator() {
     ]);
   }
 
-  const enabled =
-    users.every((user) => !!user.dateRegistration && !!user.dateLastActivity) &&
-    !!users.length;
+  const completed = users.every(
+    (user) => !!user.dateRegistration && !!user.dateLastActivity
+  );
+
+  const enabled = completed && !!users.length;
 
   return (
     <CalculatorContainer>
@@ -152,10 +153,16 @@ function Calculator() {
           {/* todo: можно добавить кнопки удаления строки справа от строки */}
           {users.map((user, i) => (
             <Fragment key={i}>
-              <Input type="number" value={user.id ?? ""} readOnly />
+              <Input
+                type="number"
+                value={user.id ?? ""}
+                fullness={true}
+                readOnly
+              />
               <Input
                 type="date"
                 value={user.dateRegistration}
+                fullness={!!user.dateRegistration}
                 onChange={(evt) =>
                   handleChange(evt.target.value, i, "dateRegistration")
                 }
@@ -163,6 +170,7 @@ function Calculator() {
               <Input
                 type="date"
                 value={user.dateLastActivity}
+                fullness={!!user.dateLastActivity}
                 onChange={(evt) =>
                   handleChange(evt.target.value, i, "dateLastActivity")
                 }
@@ -238,11 +246,11 @@ const Subtitle = styled.h4`
   margin: 0 0 18px 0;
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ fullness?: boolean }>`
   width: 100%;
   height: 28px;
   box-sizing: border-box;
-  background: #ffffff;
+  background: "#ffffff";
   border: none;
   border-radius: 99em;
   outline: none;
@@ -250,7 +258,8 @@ const Input = styled.input`
   line-height: 16px;
   font-weight: 400;
   text-align: center;
-  color: #5d6d97;
+  color: ${({ fullness }) =>
+    fullness ? "#5d6d97" : "rgba(255, 81, 81, 0.53)"};
   padding: 0 15px 0 15px;
 
   ::-webkit-calendar-picker-indicator {

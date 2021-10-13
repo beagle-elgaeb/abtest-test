@@ -1,6 +1,6 @@
 # Тестовое задание от AB test real
 
-[Ссылка на GH Pages](https://beagle-elgaeb.github.io/abtest-test/ "Этот проект на GH Pages")
+_[Ссылка на GH Pages](https://beagle-elgaeb.github.io/abtest-test/ "Этот проект на GH Pages")_
 
 <p>
   <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript"><img src="readme/icon-js.svg" alt="JS"></a>
@@ -31,6 +31,10 @@
 
 - рассчитывается и выводится метрика с названием "Rolling Retention 7 day";
 - рисуется гистограмма распределения длительностей жизней пользователей.
+
+_[UI-элементы нужно взять тут](https://www.figma.com/file/QiNnIWCBeOGxhmrXN2UILQ/%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%84%D0%B5%D0%B9%D1%81-Copy?node-id=0%3A1 "Ссылка на Фигму")_
+
+Приложение задеплоить любым удобным способом, чтобы был общедоступный URL к нему.
 
 ## Функциональность получившегося приложения
 

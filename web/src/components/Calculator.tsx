@@ -6,13 +6,7 @@ import { UserData } from "../utils/types";
 import { Metric } from "./Metric";
 
 function Calculator() {
-  const [users, setUsers] = useState<UserData[]>([
-    {
-      id: undefined,
-      dateRegistration: "",
-      dateLastActivity: "",
-    },
-  ]);
+  const [users, setUsers] = useState<UserData[]>([]);
 
   const [rollingRetention, setRollingRetention] = useState<number>();
   const [groupedTimeIntervals, setGroupedTimeIntervals] = useState<number[]>();
@@ -22,6 +16,8 @@ function Calculator() {
       const users = await api.getUsers();
 
       setUsers(users);
+
+      addRow();
     }
 
     loadUsers();
@@ -114,8 +110,6 @@ function Calculator() {
     let threeWeek = 0;
     let fourWeek = 0;
     let fourWeekAndMore = 0;
-
-    console.log(timeIntervals);
 
     timeIntervals.forEach((interval) => {
       if (interval === 0) {

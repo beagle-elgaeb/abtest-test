@@ -15,9 +15,11 @@ function Calculator() {
     async function loadUsers() {
       const users = await api.getUsers();
 
-      setUsers(users);
+      if (!users.length) {
+        addRow();
+      }
 
-      addRow();
+      setUsers(users);
     }
 
     loadUsers();
@@ -92,9 +94,7 @@ function Calculator() {
     );
 
     const timeIntervals = users
-      .filter((user) => {
-        return !!user.dateRegistration && !!user.dateLastActivity;
-      })
+      .filter((user) => !!user.dateRegistration && !!user.dateLastActivity)
       .map((user) => {
         const reg = new Date(user.dateRegistration);
         const lastAct = new Date(user.dateLastActivity);
@@ -137,6 +137,10 @@ function Calculator() {
     ]);
   }
 
+  const enabled =
+    users.every((user) => !!user.dateRegistration && !!user.dateLastActivity) &&
+    !!users.length;
+
   return (
     <CalculatorContainer>
       <Title>Calculator</Title>
@@ -175,7 +179,7 @@ function Calculator() {
           groupedTimeIntervals={groupedTimeIntervals}
         />
         <Buttons>
-          <Button type="button" onClick={saveUsers}>
+          <Button type="button" onClick={saveUsers} disabled={!enabled}>
             Save
           </Button>
           <Button type="button" onClick={calculateRollingRetention}>
@@ -265,6 +269,7 @@ const AddButton = styled.button`
   line-height: 16px;
   font-weight: 400;
   color: #5d6e97;
+  cursor: pointer;
   margin: 32px 0 0 0;
 `;
 
@@ -280,7 +285,6 @@ const Buttons = styled.div`
   margin: 50px 0 19px 0;
 `;
 
-// todo: можно сделать неактивными, если ничего не изменено
 // todo: улучшить UX: добавить многоточие в момент отправки запроса
 const Button = styled.button`
   max-width: 189px;
@@ -288,6 +292,7 @@ const Button = styled.button`
   height: 38px;
   display: block;
   background: #4a9dff;
+  opacity: ${({ disabled }) => (disabled ? "0.4" : "1")};
   border: none;
   border-radius: 10px;
   outline: none;
@@ -296,6 +301,7 @@ const Button = styled.button`
   font-weight: 400;
   color: #ffffff;
   text-transform: uppercase;
+  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
   margin: 0 30px 0 0;
 
   :last-child {

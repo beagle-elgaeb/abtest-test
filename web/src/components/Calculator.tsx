@@ -15,11 +15,11 @@ function Calculator() {
     async function loadUsers() {
       const users = await api.getUsers();
 
+      setUsers(users);
+
       if (!users.length) {
         addRow();
       }
-
-      setUsers(users);
     }
 
     loadUsers();
@@ -182,7 +182,11 @@ function Calculator() {
           <Button type="button" onClick={saveUsers} disabled={!enabled}>
             Save
           </Button>
-          <Button type="button" onClick={calculateRollingRetention}>
+          <Button
+            type="button"
+            onClick={calculateRollingRetention}
+            disabled={!enabled}
+          >
             Calculate
           </Button>
         </Buttons>

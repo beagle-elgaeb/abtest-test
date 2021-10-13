@@ -1,4 +1,4 @@
-# Тестовое задание от AB test real
+# Тестовое задание от AB Test Real
 
 _[Ссылка на GH Pages](https://beagle-elgaeb.github.io/abtest-test/ "Этот проект на GH Pages")_
 

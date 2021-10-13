@@ -1,6 +1,6 @@
 # Тестовое задание от AB Test Real
 
-_[Ссылка на GH Pages](https://beagle-elgaeb.github.io/abtest-test/ "Этот проект на GH Pages")_
+_[Ссылка на приложение](http://178.128.136.91/ "Приложение")_
 
 <p>
   <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript"><img src="readme/icon-js.svg" alt="JS"></a>
@@ -42,6 +42,7 @@ _[UI-элементы нужно взять тут](https://www.figma.com/file/Q
 - по кнопке `+ Add one more` добавляются поля вввода;
 - по кнопке `Save` новые введённые данные сохраняются на сервере;
 - по кнопке `Calculate` производится рассчёт метрики "Rolling Retention 7 day" и построение гистограммы распределения длительностей жизней пользователей;
+- приложение задеплоено;
 - страница адаптируется в пределах 700px - 1334px;
 
 ## Возможные улучшения

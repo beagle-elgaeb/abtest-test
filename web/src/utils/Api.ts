@@ -1,5 +1,5 @@
 import { UserData } from "./types";
-export const BASE_URL = "http://localhost:4000";
+export const BASE_URL = "http://178.128.136.91:4000";
 
 export async function getUsers() {
   const res = await fetch(`${BASE_URL}/users`);

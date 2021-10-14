@@ -5,11 +5,12 @@ import * as api from "../utils/Api";
 import { UserData } from "../utils/types";
 import { Metric } from "./Metric";
 
+// todo: неплохо бы разделить этот компонент на помельче
+
 function Calculator() {
   const [users, setUsers] = useState<UserData[]>([]);
-
   const [rollingRetention, setRollingRetention] = useState<number>();
-  const [groupedTimeIntervals, setGroupedTimeIntervals] = useState<number[]>();
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function loadUsers() {
@@ -50,6 +51,7 @@ function Calculator() {
   }
 
   async function saveUsers() {
+    setSaving(true);
     const promisedData = users.map(async (user) => {
       if (!user.dateRegistration || !user.dateLastActivity) {
         return user;
@@ -65,6 +67,7 @@ function Calculator() {
     const promisedUsers = await Promise.all(promisedData);
 
     setUsers(promisedUsers);
+    setSaving(false);
   }
 
   function calculateRollingRetention() {
@@ -91,56 +94,22 @@ function Calculator() {
     setRollingRetention(
       Math.round((returningUsers.length * 100) / registeredUsers.length)
     );
-
-    const timeIntervals = users
-      .filter((user) => !!user.dateRegistration && !!user.dateLastActivity)
-      .map((user) => {
-        const reg = new Date(user.dateRegistration);
-        const lastAct = new Date(user.dateLastActivity);
-
-        const period = (lastAct.getTime() - reg.getTime()) / msInDay;
-
-        return period;
-      });
-
-    let oneDay = 0;
-    let oneWeek = 0;
-    let twoWeek = 0;
-    let threeWeek = 0;
-    let fourWeek = 0;
-    let fourWeekAndMore = 0;
-
-    timeIntervals.forEach((interval) => {
-      if (interval === 0) {
-        oneDay++;
-      } else if (interval < 7) {
-        oneWeek++;
-      } else if (interval < 14) {
-        twoWeek++;
-      } else if (interval < 21) {
-        threeWeek++;
-      } else if (interval < 28) {
-        fourWeek++;
-      } else {
-        fourWeekAndMore++;
-      }
-    });
-
-    setGroupedTimeIntervals([
-      oneDay,
-      oneWeek,
-      twoWeek,
-      threeWeek,
-      fourWeek,
-      fourWeekAndMore,
-    ]);
   }
+
+  const timeOrder = users.every((user) => {
+    const reg = new Date(user.dateRegistration);
+    const lastAct = new Date(user.dateLastActivity);
+
+    return reg <= lastAct;
+  });
 
   const completed = users.every(
     (user) => !!user.dateRegistration && !!user.dateLastActivity
   );
 
-  const enabled = completed && !!users.length;
+  const correct = timeOrder && completed;
+
+  const enabled = correct && !!users.length;
 
   return (
     <CalculatorContainer>
@@ -178,22 +147,26 @@ function Calculator() {
             </Fragment>
           ))}
         </Fieldset>
+        {!timeOrder && completed && (
+          <Error>В одной из строк нарушен порядок времени</Error>
+        )}
         <AddButton type="button" onClick={addRow}>
           <Plus src={plus} />
           Add one more
         </AddButton>
-        <Metric
-          rollingRetention={rollingRetention}
-          groupedTimeIntervals={groupedTimeIntervals}
-        />
+        <Metric rollingRetention={rollingRetention} users={users} />
         <Buttons>
-          <Button type="button" onClick={saveUsers} disabled={!enabled}>
-            Save
+          <Button
+            type="button"
+            onClick={saveUsers}
+            disabled={!enabled || saving}
+          >
+            Save{saving && "..."}
           </Button>
           <Button
             type="button"
             onClick={calculateRollingRetention}
-            disabled={!enabled}
+            disabled={!enabled || saving}
           >
             Calculate
           </Button>
@@ -250,7 +223,7 @@ const Input = styled.input<{ fullness?: boolean }>`
   width: 100%;
   height: 28px;
   box-sizing: border-box;
-  background: "#ffffff";
+  background: #ffffff;
   border: none;
   border-radius: 99em;
   outline: none;
@@ -270,6 +243,14 @@ const Input = styled.input<{ fullness?: boolean }>`
   ::-webkit-inner-spin-button {
     display: none;
   }
+`;
+
+const Error = styled.p`
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 400;
+  color: rgba(255, 81, 81, 0.53);
+  padding: 0 5px 0 0;
 `;
 
 const AddButton = styled.button`
@@ -298,7 +279,6 @@ const Buttons = styled.div`
   margin: 50px 0 19px 0;
 `;
 
-// todo: улучшить UX: добавить многоточие в момент отправки запроса
 const Button = styled.button`
   max-width: 189px;
   width: 45%;

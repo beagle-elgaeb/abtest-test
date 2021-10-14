@@ -1,53 +1,52 @@
 import { Bar } from "react-chartjs-2";
 import styled from "styled-components/macro";
+import { UserData } from "../utils/types";
 
 interface Props {
   rollingRetention: number | undefined;
-  groupedTimeIntervals: number[] | undefined;
+  users: UserData[];
 }
 
+// лучше округлять. например, до большего
+// и разместить столбцы гистограммы между интервалами,
+// но уже пора спать
+
 export function Metric(props: Props) {
+  const intervals = calcIntervals(props.users);
+
+  const labels = intervals.map((interval, i) => {
+    if (i <= 1) {
+      return `${i} week`;
+    }
+    return `${i} weeks`;
+  });
+
   const data = {
-    labels: [
-      "1 day",
-      "up to 1 week",
-      "up to 2 weeks",
-      "up to 3 weeks",
-      "up to 4 weeks",
-      "4 weeks and more",
-    ],
+    labels: labels,
     datasets: [
       {
-        label: "# of Votes",
-        data: props.groupedTimeIntervals!,
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
+        data: intervals,
+        backgroundColor: ["rgba(54, 162, 235, 0.2)"],
+        borderColor: ["rgba(54, 162, 235, 1)"],
         borderWidth: 1,
       },
     ],
   };
 
+  if (props.rollingRetention === undefined) {
+    return null;
+  }
+
   return (
     <MetricContainer>
       <MetricTitle>
-        Rolling Retention 7 day: {props.rollingRetention}%
+        Rolling Retention 7 day:{" "}
+        {Number.isNaN(props.rollingRetention)
+          ? "no data"
+          : `${props.rollingRetention} %`}
       </MetricTitle>
       <Histogram>
-        {props.groupedTimeIntervals && <Bar data={data} options={options} />}
+        {props.users && <Bar data={data} options={options} />}
       </Histogram>
     </MetricContainer>
   );
@@ -58,6 +57,30 @@ const options = {
     legend: { display: false },
   },
 };
+
+// todo: возможно добавить агрумент длительности интервалов
+// todo: возможно добавить выбор интервала, для которого строится график
+function calcIntervals(users: UserData[]) {
+  let groups: number[] = [];
+
+  users
+    .filter((user) => !!user.dateRegistration && !!user.dateLastActivity)
+    .forEach((user) => {
+      const msInWeek = 604800000;
+      const reg = new Date(user.dateRegistration);
+      const lastAct = new Date(user.dateLastActivity);
+
+      const period = Math.round((lastAct.getTime() - reg.getTime()) / msInWeek);
+
+      if (!groups[period]) {
+        groups[period] = 0;
+      }
+
+      groups[period]++;
+    });
+
+  return Array.from(groups); //убирает пропуски в массиве, чтоб не лишать график пропорциональности
+}
 
 const MetricContainer = styled.div``;
 

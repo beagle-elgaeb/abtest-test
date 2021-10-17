@@ -81,6 +81,20 @@ app.patch("/users", async (req, res) => {
   }
 });
 
+app.delete("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    await client.query("DELETE FROM users WHERE id=$1", [userId]);
+
+    res.end("Запись удалена");
+  } catch (err) {
+    res.status(500).send({
+      message: `Сервер не может обработать запрос. Статус ошибки: ${err.message}`,
+    });
+  }
+});
+
 app.use((req, res) => {
   res.status(404).send({ message: "Запрошена несуществующая страница" });
 });

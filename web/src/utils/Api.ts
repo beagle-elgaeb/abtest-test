@@ -4,13 +4,13 @@ export const BASE_URL = "http://178.128.136.91:4000";
 export async function getUsers() {
   const res = await fetch(`${BASE_URL}/users`);
 
-  if (res.ok) {
-    const values = await res.json();
-
-    return values as UserData[];
+  if (!res.ok) {
+    throw new Error(`Статут ошибки: ${res.status}`);
   }
 
-  throw new Error(`Статут ошибки: ${res.status}`);
+  const values = await res.json();
+
+  return values as UserData[];
 }
 
 export async function createUser(user: UserData) {
@@ -22,13 +22,13 @@ export async function createUser(user: UserData) {
     body: JSON.stringify(user),
   });
 
-  if (res.ok) {
-    const values = await res.json();
-
-    return values as UserData;
+  if (!res.ok) {
+    throw new Error(`Статут ошибки: ${res.status}`);
   }
 
-  throw new Error(`Статут ошибки: ${res.status}`);
+  const values = await res.json();
+
+  return values as UserData;
 }
 
 export async function updateUser(user: UserData) {
@@ -40,11 +40,21 @@ export async function updateUser(user: UserData) {
     body: JSON.stringify(user),
   });
 
-  if (res.ok) {
-    const values = await res.json();
-
-    return values as UserData;
+  if (!res.ok) {
+    throw new Error(`Статут ошибки: ${res.status}`);
   }
 
-  throw new Error(`Статут ошибки: ${res.status}`);
+  const values = await res.json();
+
+  return values as UserData;
+}
+
+export async function deleteUser(user: UserData) {
+  const res = await fetch(`${BASE_URL}/users/${user.id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Статут ошибки: ${res.status}`);
+  }
 }

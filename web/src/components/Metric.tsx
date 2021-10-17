@@ -12,7 +12,7 @@ export function Metric(props: Props) {
   const intervals = calcIntervals(props.users);
 
   const labels = intervals.map((interval, i) => {
-    return `${i}`;
+    return `from ${i} to ${i + 1}`;
   });
 
   const data = {
@@ -49,10 +49,6 @@ export function Metric(props: Props) {
           text: "Weeks",
           color: "#4A9DFF",
         },
-        ticks: {
-          labelOffset: -30, // пока не разобралась, как нормально сместить значения под точку, а не под столбик
-          // это решение хорошо выглялит на 12 неделях
-        },
       },
     },
   };
@@ -76,6 +72,7 @@ export function Metric(props: Props) {
   );
 }
 
+// для большего количества данных:
 // todo: возможно добавить выбор интервалов
 // todo: возможно добавить выбор диапазона, для которого строится график
 function calcIntervals(users: UserData[]) {

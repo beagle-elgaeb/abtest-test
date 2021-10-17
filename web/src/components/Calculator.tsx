@@ -1,11 +1,11 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import plus from "../images/icon-plus.svg";
 import * as api from "../utils/Api";
 import { UserData } from "../utils/types";
 import { Metric } from "./Metric";
-
-// todo: неплохо бы разделить этот компонент на помельче
+import { Line } from "./Line";
+import produce from "immer";
 
 function Calculator() {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -26,14 +26,15 @@ function Calculator() {
     loadUsers();
   }, []);
 
-  function handleChange(value: string, index: number, name: string) {
+  function handleChange(
+    value: string,
+    index: number,
+    name: "dateRegistration" | "dateLastActivity"
+  ) {
     setUsers((inputs) => {
-      const newState = [...inputs];
-
-      newState[index] = {
-        ...newState[index],
-        [name]: value,
-      };
+      const newState = produce(inputs, (inputs) => {
+        inputs[index][name] = value;
+      });
 
       return newState;
     });
@@ -68,6 +69,24 @@ function Calculator() {
 
     setUsers(promisedUsers);
     setSaving(false);
+  }
+
+  // todo: сделать удаление на сервере только после нажатия на кнопку сохранения
+
+  async function deleteUsers(index: number) {
+    const user = users[index];
+
+    if (user.id) {
+      await api.deleteUser(user);
+    }
+
+    setUsers((users) => {
+      const newState = produce(users, (users) => {
+        users.splice(index, 1);
+      });
+
+      return newState;
+    });
   }
 
   function calculateRollingRetention() {
@@ -119,32 +138,15 @@ function Calculator() {
           <Subtitle>User ID</Subtitle>
           <Subtitle>Date Registration</Subtitle>
           <Subtitle>Date Last Activity</Subtitle>
-          {/* todo: можно добавить кнопки удаления строки справа от строки */}
+          <Subtitle>Del</Subtitle>
           {users.map((user, i) => (
-            <Fragment key={i}>
-              <Input
-                type="number"
-                value={user.id ?? ""}
-                fullness={true}
-                readOnly
-              />
-              <Input
-                type="date"
-                value={user.dateRegistration}
-                fullness={!!user.dateRegistration}
-                onChange={(evt) =>
-                  handleChange(evt.target.value, i, "dateRegistration")
-                }
-              />
-              <Input
-                type="date"
-                value={user.dateLastActivity}
-                fullness={!!user.dateLastActivity}
-                onChange={(evt) =>
-                  handleChange(evt.target.value, i, "dateLastActivity")
-                }
-              />
-            </Fragment>
+            <Line
+              key={i}
+              index={i}
+              user={user}
+              handleChange={handleChange}
+              deleteUsers={deleteUsers}
+            ></Line>
           ))}
         </Fieldset>
         {!timeOrder && completed && (
@@ -200,7 +202,7 @@ const Form = styled.form`
 
 const Fieldset = styled.fieldset`
   display: grid;
-  grid-template-columns: 1fr 2fr 2fr;
+  grid-template-columns: 2fr 6fr 6fr 1fr;
   grid-template-rows: repeat(auto, 1fr);
   grid-gap: 15px;
   border: none;
@@ -217,32 +219,6 @@ const Subtitle = styled.h4`
   text-align: center;
   opacity: 0.4;
   margin: 0 0 18px 0;
-`;
-
-const Input = styled.input<{ fullness?: boolean }>`
-  width: 100%;
-  height: 28px;
-  box-sizing: border-box;
-  background: #ffffff;
-  border: none;
-  border-radius: 99em;
-  outline: none;
-  font-size: 14px;
-  line-height: 16px;
-  font-weight: 400;
-  text-align: center;
-  color: ${({ fullness }) =>
-    fullness ? "#5d6d97" : "rgba(255, 81, 81, 0.53)"};
-  padding: 0 15px 0 15px;
-
-  ::-webkit-calendar-picker-indicator {
-    display: none;
-  }
-
-  ::-webkit-outer-spin-button,
-  ::-webkit-inner-spin-button {
-    display: none;
-  }
 `;
 
 const Error = styled.p`

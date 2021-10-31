@@ -71,6 +71,9 @@ _[Макет](https://www.figma.com/file/QiNnIWCBeOGxhmrXN2UILQ/%D0%B8%D0%BD%D1%
 
 ## Как использовать
 
+Установка сопутствующих библиотек:  
+`yarn`
+
 Сборка фронтенда:  
 `yarn build`
 

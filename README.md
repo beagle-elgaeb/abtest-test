@@ -11,8 +11,6 @@ _[Ссылка на приложение](http://178.128.136.91/ "Приложе
     <img src="readme/icon-whitespace-5px.svg"/>
   <a href="https://ru.reactjs.org/"><img src="readme/icon-react.svg" alt="React"></a>
     <img src="readme/icon-whitespace-5px.svg"/>
-  <a href="https://redux.js.org/"><img src="readme/icon-redux.svg" alt="Redux"></a>
-    <img src="readme/icon-whitespace-5px.svg"/>
   <a href="https://www.chartjs.org/"><img src="readme/icon-chart.svg" alt="ChartJs"></a>
     <img src="readme/icon-whitespace-5px.svg"/>
   <a href="https://yarnpkg.com/"><img src="readme/icon-yarn.svg" alt="Yarn"></a>
